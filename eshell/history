@@ -1,11 +1,10 @@
+exa
+ls exa -la
+ff config.org 
+ff eshell/aliases 
+exa
 ls
 ls -la
-nvim
-clear
 ls
-clear
+ls -la
 ls
-exit
-ls
-exit 
- exit

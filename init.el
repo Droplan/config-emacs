@@ -1,4 +1,3 @@
-;; Creates configuration file from .org file
 (org-babel-load-file
  (expand-file-name
   "config.org"
@@ -8,10 +7,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(deeper-blue))
+ '(custom-enabled-themes '(doom-one))
  '(custom-safe-themes
-   '("dd078e6b1260f3dc1ba7dd562ce21443d62fc10cd31906e325bd3a7485ca9552" default))
- '(package-selected-packages '(ivy-rich all-the-icons-ivy-rich all-the-icons)))
+   '("88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" default))
+ '(warning-suppress-types '((emacs))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

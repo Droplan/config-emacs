@@ -52,7 +52,7 @@
 - [[#which-key][WHICH-KEY]]
 
 * IMPORTANT PROGRAMS TO LOAD FIRST
-To keep this =config.org= a reasonable length, I have moved a lot of code to individual scripts that will be sourced by this config.  These scripts are found in "~/.config/emacs/scripts" and do not contain any code that most people are likely to need to edit.
+To keep this =config.org= a reasonable length, I have moved a lot of code to individual scripts that will be sourced by this config. These scripts are found in "~/.config/emacs/scripts" and do not contain any code that most people are likely to need to edit.
 
 ** Adding the scripts directory to path
 #+begin_src emacs-lisp

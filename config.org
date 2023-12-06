@@ -281,7 +281,8 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
   (use-package toc-org
     :ensure t
     :commands toc-org-enable
-    :init (add-hook 'org-mode-hook 'toc-org-enable))
+    :init (add-hook 'org-mode-hook 'toc-org-enable)
+    (add-hook 'markdown-mode-hook 'toc-org-mode))
 #+end_src
 
 ** Org Bullets
@@ -356,9 +357,8 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
     (setq dashboard-set-file-icons t)
     (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
     ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-    (setq dashboard-startup-banner "~/.config/emacs/images/dtmacs-logo.png")  ;; use custom image as banner
     (setq dashboard-center-content nil) ;; set to 't' for centered content
-    (setq dashboard-items '((recents . 5)
+    (setq dashboard-items '((recents . 10)
                             (agenda . 5 )
                             (bookmarks . 3)
                             (projects . 3)

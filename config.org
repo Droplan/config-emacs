@@ -14,10 +14,20 @@
 - [[#org-mode][ORG MODE]]
   - [[#toc][TOC]]
   - [[#org-bullets][Org Bullets]]
-- [[#which-key][WHICH-KEY]]
+- [[#git][GIT]]
+  - [[#magit][Magit]]
+- [[#projectile][PROJECTILE]]
+- [[#удобство][УДОБСТВО]]
+  - [[#which-key][WHICH-KEY]]
+  - [[#diminish][DIMINISH]]
+  - [[#dashboard][DASHBOARD]]
 - [[#оформление][Оформление]]
+  - [[#fonts][FONTS]]
   - [[#установка-темы][Установка темы]]
   - [[#плавная-прокрутка][Плавная прокрутка]]
+  - [[#all-the-icons][ALL THE ICONS]]
+  - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
+  - [[#rainbow-mode][RAINBOW MODE]]
 - [[#установки-клавиш][Установки клавиш]]
 - [[#установка-значений-переменных][Установка значений переменных]]
 
@@ -35,7 +45,6 @@
 #+end_src
 
 * АВТОЗАВЕРШЕНИЕ
-
 ** Vertico
 Vertico предоставляет производительный и минималистичный пользовательский интерфейс вертикального завершения, основанный на системе завершения по умолчанию
 
@@ -230,13 +239,14 @@ Consult предоставляет команды поиска и навигац
     ;; (setq consult-project-function nil)
     )
 #+end_src
-
 ** Company
 Company is a text completion framework for Emacs. The name stands for “complete anything”. Completion will start automatically after you type a few letters. Use M-n and M-p to select, <return> to complete or <tab> to complete the common part.
 
 #+begin_src emacs-lisp
   (use-package company
     :ensure t
+    :defer 2
+    :diminish
     :init (global-company-mode)
     :bind (:map company-active-map
                 ("<tab>" . company-select-next)
@@ -252,11 +262,13 @@ Company is a text completion framework for Emacs. The name stands for “complet
 #+end_src
 
 ** Flycheck
-Install luacheck from your Linux distro’s repositories for flycheck to work correctly with lua files. Install python-pylint for flycheck to work with python files. Haskell works with flycheck as long as haskell-ghc or haskell-stack-ghc is installed. For more information on language support for flycheck, read this.
+Install =luacheck= from your Linux distro's repositories for flycheck to work correctly with lua files.  Install =python-pylint= for flycheck to work with python files.  Haskell works with flycheck as long as =haskell-ghc= or =haskell-stack-ghc= is installed.  For more information on language support for flycheck, [[https://www.flycheck.org/en/latest/languages.html][read this]].
+
 #+begin_src emacs-lisp
   (use-package flycheck
     :ensure t
     :defer t
+    :diminish
     :init (global-flycheck-mode))
 #+end_src
 
@@ -282,7 +294,24 @@ Install luacheck from your Linux distro’s repositories for flycheck to work co
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 
-* WHICH-KEY
+* GIT
+** Magit
+[[https://magit.vc/manual/][Magit]] is a full-featured git client for Emacs.
+#+begin_src emacs-lisp
+  (use-package magit)
+#+end_src
+
+* PROJECTILE
+[[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs.
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config
+    (projectile-mode 1))
+#+end_src
+
+* УДОБСТВО
+** WHICH-KEY
 Отображает списки сочетаний клавиш, при вводе префиксов
 #+begin_src emacs-lisp
   (use-package which-key
@@ -306,7 +335,75 @@ Install luacheck from your Linux distro’s repositories for flycheck to work co
           which-key-separator " → " ))
 #+end_src
 
+** DIMINISH
+This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
+
+#+begin_src emacs-lisp
+  (use-package diminish
+    :ensure t
+    )
+#+end_src
+
+** DASHBOARD
+Emacs Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t 
+    :init
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
+    ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+    (setq dashboard-startup-banner "~/.config/emacs/images/dtmacs-logo.png")  ;; use custom image as banner
+    (setq dashboard-center-content nil) ;; set to 't' for centered content
+    (setq dashboard-items '((recents . 5)
+                            (agenda . 5 )
+                            (bookmarks . 3)
+                            (projects . 3)
+                            (registers . 3)))
+    :custom 
+    (dashboard-modify-heading-icons '((recents . "file-text")
+                                      (bookmarks . "book")))
+    :config
+    (dashboard-setup-startup-hook))
+#+end_src
+
 * Оформление
+** FONTS
+Определение различных шрифтов, которые будет использовать Emacs.
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+                      :font "JetBrains Mono"
+                      :height 110
+                      :weight 'medium)
+  (set-face-attribute 'variable-pitch nil
+                      :font "Ubuntu"
+                      :height 120
+                      :weight 'medium)
+  (set-face-attribute 'fixed-pitch nil
+                      :font "JetBrains Mono"
+                      :height 110
+                      :weight 'medium)
+  ;; Makes commented text and keywords italics.
+  ;; This is working in emacsclient but not emacs.
+  ;; Your font must have an italic face available.
+  (set-face-attribute 'font-lock-comment-face nil
+                      :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil
+                      :slant 'italic)
+
+  ;; This sets the default font on all graphical frames created after restarting Emacs.
+  ;; Does the same thing as 'set-face-attribute default' above, but emacsclient fonts
+  ;; are not right unless I also add this method of setting the default font.
+  (add-to-list 'default-frame-alist '(font . "JetBrains Mono-11"))
+
+  ;; Uncomment the following line if line spacing needs adjusting.
+  (setq-default line-spacing 0.12)
+#+end_src
+
 ** Установка темы
 #+begin_src emacs-lisp
   (use-package atom-one-dark-theme
@@ -321,6 +418,36 @@ Install luacheck from your Linux distro’s repositories for flycheck to work co
         scroll-step 1
         scroll-conservatively 10000
         scroll-preserve-screen-position 1)
+#+end_src
+
+** ALL THE ICONS
+Это набор значков, который можно использовать с dashboard, dired, ibuffer и другими программами Emacs
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :ensure t
+    :if (display-graphic-p))
+
+  (use-package all-the-icons-dired
+    :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+#+end_src
+** RAINBOW DELIMITERS
+Добавляет окраску различным цветом скобок и кавычек
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :ensure t
+    :hook ((emacs-lisp-mode . rainbow-delimiters-mode)
+           (clojure-mode . rainbow-delimiters-mode)))
+#+end_src
+
+** RAINBOW MODE
+Отображать фактический цвет в качестве фона для любого шестнадцатеричного значения цвета (например, #ffffff). Приведенный ниже блок кода включает режим rainbow во всех режимах программирования (prog-mode), а также в org-mode, именно поэтому rainbow работает в этом документе.  
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :diminish
+    :hook org-mode prog-mode)
 #+end_src
 
 * Установки клавиш

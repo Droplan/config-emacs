@@ -6,14 +6,16 @@
 
 * TABLE OF CONTENTS                                                     :toc:
 - [[#melpa][MELPA]]
+- [[#настройки-use-package][НАСТРОЙКИ USE-PACKAGE]]
 - [[#автозавершение][АВТОЗАВЕРШЕНИЕ]]
   - [[#vertico][Vertico]]
   - [[#consult][Consult]]
   - [[#company][Company]]
   - [[#flycheck][Flycheck]]
-- [[#org-mode][ORG MODE]]
-  - [[#toc][TOC]]
-  - [[#org-bullets][Org Bullets]]
+- [[#настройки-режимов][НАСТРОЙКИ РЕЖИМОВ]]
+  - [[#markdown-mode][MARKDOWN MODE]]
+  - [[#org-mode][ORG MODE]]
+  - [[#language-support][LANGUAGE SUPPORT]]
 - [[#git][GIT]]
   - [[#magit][Magit]]
 - [[#projectile][PROJECTILE]]
@@ -44,6 +46,15 @@
   (package-initialize)
 #+end_src
 
+* НАСТРОЙКИ USE-PACKAGE
+USE-PACKAGE включён в ядро, но в стандартной конфигурации он принимает только конфигурацию, не устанавливая пакет без ключа ~:ensure t~, что неудобно
+#+begin_src emacs-lisp
+  (use-package use-package
+    :custom
+    (use-package-always-ensure t)
+    (package-native-compile t))
+#+end_src
+
 * АВТОЗАВЕРШЕНИЕ
 ** Vertico
 Vertico предоставляет производительный и минималистичный пользовательский интерфейс вертикального завершения, основанный на системе завершения по умолчанию
@@ -51,32 +62,21 @@ Vertico предоставляет производительный и мини�
 #+begin_src emacs-lisp
   ;; Enable vertico
   (use-package vertico
-    :ensure t
     :init
     (vertico-mode)
-
-    ;; Different scroll margin
-    (setq vertico-scroll-margin 0)
-
-    ;; Show more candidates
-    (setq vertico-count 20)
-
-    ;; Grow and shrink the Vertico minibuffer
-    (setq vertico-resize t)
-
-    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-    (setq vertico-cycle t)
+    (setq vertico-scroll-margin 0) ;; Different scroll margin
+    (setq vertico-count 20) ;; Show more candidates
+    (setq vertico-resize t) ;; Grow and shrink the Vertico minibuffer
+    (setq vertico-cycle t) ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     )
 
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist
-    :ensure t
     :init
     (savehist-mode))
 
   ;; A few more useful configurations...
   (use-package emacs
-    :ensure t
     :init
     ;; Add prompt indicator to `completing-read-multiple'.
     ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -104,7 +104,6 @@ Vertico предоставляет производительный и мини�
 
   ;; Optionally use the `orderless' completion style.
   (use-package orderless
-    :ensure t
     :init
     ;; Configure a custom style dispatcher (see the Consult wiki)
     ;; (setq orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch)
@@ -120,7 +119,6 @@ Consult предоставляет команды поиска и навигац
 #+begin_src emacs-lisp
   ;; Example configuration for Consult
   (use-package consult
-    :ensure t
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings in `mode-specific-map'
            ("C-c M-x" . consult-mode-command)
@@ -233,8 +231,8 @@ Consult предоставляет команды поиска и навигац
     ;;;; 3. locate-dominating-file
     ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
     ;;;; 4. projectile.el (projectile-project-root)
-    ;; (autoload 'projectile-project-root "projectile")
-    ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-function (lambda (_) (projectile-project-root)))
     ;;;; 5. No project support
     ;; (setq consult-project-function nil)
     )
@@ -244,7 +242,6 @@ Company is a text completion framework for Emacs. The name stands for “complet
 
 #+begin_src emacs-lisp
   (use-package company
-    :ensure t
     :defer 2
     :diminish
     :init (global-company-mode)
@@ -258,7 +255,6 @@ Company is a text completion framework for Emacs. The name stands for “complet
     (company-show-numbers t)
     (company-tooltip-align-annotations 't)
     (global-company-mode t))
-
 #+end_src
 
 ** Flycheck
@@ -266,41 +262,54 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 
 #+begin_src emacs-lisp
   (use-package flycheck
-    :ensure t
     :defer t
     :diminish
     :init (global-flycheck-mode))
 #+end_src
 
-* ORG MODE
+* НАСТРОЙКИ РЕЖИМОВ
+** MARKDOWN MODE
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown")
+    :bind (:map markdown-mode-map
+                ("C-c C-e" . markdown-do)))
+#+end_src
 
-** TOC
+** ORG MODE
+
+*** TOC
 Вставить содержание можно в org и markdown файлах, установив тег ~:toc:~ у заголовка и применив команду ~toc-org-insert-toc~
 
 #+begin_src emacs-lisp
   (use-package toc-org
-    :ensure t
     :commands toc-org-enable
     :init (add-hook 'org-mode-hook 'toc-org-enable)
     (add-hook 'markdown-mode-hook 'toc-org-mode))
 #+end_src
 
-** Org Bullets
+*** Org Bullets
 Заменяет звездочки заголовков маркерами
 
 #+begin_src emacs-lisp
   (add-hook 'org-mode-hook 'org-indent-mode)
-  (use-package org-bullets
-    :ensure t)
+  (use-package org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+#+end_src
+
+** LANGUAGE SUPPORT
+Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM, AWK, C, C++, Fortran, Icon, IDL (CORBA), IDLWAVE, Java, Javascript, M4, Makefiles, Metafont, Modula2, Object Pascal, Objective-C, Octave, Pascal, Perl, Pike, PostScript, Prolog, Python, Ruby, Simula, SQL, Tcl, Verilog, and VHDL. Other languages will require you to install additional modes.
+
+#+begin_src emacs-lisp
+  (use-package lua-mode)
 #+end_src
 
 * GIT
 ** Magit
 [[https://magit.vc/manual/][Magit]] is a full-featured git client for Emacs.
 #+begin_src emacs-lisp
-  (use-package magit
-    :ensure t)
+  (use-package magit)
 #+end_src
 
 * PROJECTILE
@@ -309,7 +318,6 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 
 #+begin_src emacs-lisp
   (use-package projectile
-    :ensure t
     :config
     (projectile-mode 1))
 #+end_src
@@ -319,7 +327,6 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 Отображает списки сочетаний клавиш, при вводе префиксов
 #+begin_src emacs-lisp
   (use-package which-key
-    :ensure t    
     :init
     (which-key-mode 1)
     :diminish
@@ -343,9 +350,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
 
 #+begin_src emacs-lisp
-  (use-package diminish
-    :ensure t
-    )
+  (use-package diminish)
 #+end_src
 
 ** DASHBOARD
@@ -353,13 +358,12 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 #+begin_src emacs-lisp
   (use-package dashboard
-    :ensure t 
     :init
     (setq initial-buffer-choice 'dashboard-open)
     (setq dashboard-set-heading-icons t)
     (setq dashboard-set-file-icons t)
     (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
-    ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+    (setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
     (setq dashboard-center-content nil) ;; set to 't' for centered content
     (setq dashboard-items '((recents . 10)
                             (agenda . 5 )
@@ -409,8 +413,7 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 ** Установка темы
 #+begin_src emacs-lisp
-  (use-package atom-one-dark-theme
-    :ensure t)
+  (use-package atom-one-dark-theme)
   (load-theme 'atom-one-dark t)
 #+end_src
 
@@ -428,11 +431,9 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 #+begin_src emacs-lisp
   (use-package all-the-icons
-    :ensure t
     :if (display-graphic-p))
 
   (use-package all-the-icons-dired
-    :ensure t
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 ** RAINBOW DELIMITERS
@@ -440,7 +441,6 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 #+begin_src emacs-lisp
   (use-package rainbow-delimiters
-    :ensure t
     :hook ((emacs-lisp-mode . rainbow-delimiters-mode)
            (clojure-mode . rainbow-delimiters-mode)))
 #+end_src
@@ -450,7 +450,6 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 #+begin_src emacs-lisp
   (use-package rainbow-mode
-    :ensure t
     :diminish
     :hook org-mode prog-mode)
 #+end_src
@@ -471,17 +470,19 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
   (scroll-bar-mode -1)         ;; Disable the scroll bar
   ;; (tab-bar-mode t)             ;; Позволяет пользоваться вкладками C-x t 2, переключение вперёд на C-x TAB, назад C-SHIFT-TAB, закрыть C-x t 0
 
-  (global-display-line-numbers-mode t) ;; Display line numbers
+  (global-display-line-numbers-mode t) ;; Отображает номера строк
 
-  (delete-selection-mode 1)       ;; You can select text and delete it by typing.
+  (delete-selection-mode 1)       ;; Содержимое выделенного региона удаляется при начале набора
   (electric-indent-mode -1)       ;; Turn off the weird indenting that Emacs does by default.
-  (electric-pair-mode 1)          ;; Turns on automatic parens pairing
+  (electric-pair-mode 1)          ;; Автоматическое cоздание закрывающих скобок и кавычек
   (global-auto-revert-mode t)     ;; Automatically show changes if the file has changed
   (global-visual-line-mode t)     ;; Enable truncated lines
 
   (setq make-backup-files nil)    ;; Отключает создание бэкапов
   (setq auto-save-list-file-name nil) ;; Не создаёт .saves файлы
   (setq auto-save-default nil)    ;; Отключает автоматическое сохранение файлов
+
   (put 'upcase-region 'disabled nil) ;; Включает команду преобразования в верхний регистр по C-x C-u
   (put 'downcase-region 'disabled nil) ;; Включает команду преобразования в нижний регистр по C-x C-l
- #+end_src
+  (put 'narrow-to-region 'disabled nil) ;; Включает сужение, аналог zoom в logseq, выделенного региона по C-x n n
+#+end_src

@@ -250,13 +250,20 @@ Company is a text completion framework for Emacs. The name stands for “complet
     (company-begin-commands '(self-insert-command))
     (company-idle-delay .1)
     (company-minimum-prefix-length 2)
+    (company-selection-wrap-around t)
     (company-show-numbers t)
     (company-tooltip-align-annotations 't)
     (global-company-mode t))
+
+;; Required for variable pitch
+;; When using variable pitch fonts, the dropdown menu for text completion gets distorted because the letters are not all the same size
+  (use-package company-posframe
+    :config
+    (company-posframe-mode 1))
 #+end_src
 
 ** Flycheck
-Install =luacheck= from your Linux distro's repositories for flycheck to work correctly with lua files.  Install =python-pylint= for flycheck to work with python files.  Haskell works with flycheck as long as =haskell-ghc= or =haskell-stack-ghc= is installed.  For more information on language support for flycheck, [[https://www.flycheck.org/en/latest/languages.html][read this]].
+Install =luacheck= from your Linux distro's repositories for flycheck to work correctly with lua files.  Install =python-pylint= for flycheck to work with python files. Haskell works with flycheck as long as =haskell-ghc= or =haskell-stack-ghc= is installed.  For more information on language support for flycheck, [[https://www.flycheck.org/en/latest/languages.html][read this]].
 
 #+begin_src emacs-lisp
   (use-package flycheck
@@ -317,9 +324,9 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 *** Org-bullets
 Меняет звёздочки на маркеры заголовков, в отличие от Org-modern он не изменяет отступы слева между заголовками
 #+begin_src emacs-lisp
-(add-hook 'org-mode-hook 'org-indent-mode)
-(use-package org-bullets)
-(add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (add-hook 'org-mode-hook 'org-indent-mode)
+  (use-package org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 #+end_src
 
 *** TOC
@@ -333,7 +340,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 
 *** Org-fragtog
 Пакет org-fragtog предоставляет несколько приятных функций, которые переключают между исходным кодом и предварительным просмотром формул, что означает, что вам не нужно повторно использовать функцию org-latex-preview. Пакет загружается после загрузки пакета Org.
-В итоге в орге отобажается latex в виде формул, при установке курсора на формулу открывается разметка latex.
+В итоге в орге отображается latex в виде формул, при установке курсора на формулу открывается разметка latex.
 #+begin_src emacs-lisp
   ;; LaTeX previews
   (use-package org-fragtog
@@ -428,31 +435,6 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
     (dashboard-setup-startup-hook))
 #+end_src
 
-** Olivetti-mode
-Добавляет возможность переключения в режим без отвлечений. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
-#+begin_src emacs-lisp
-  ;; Distraction-free writing
-  (defun ews-distraction-free ()
-    "Distraction-free writing environment using Olivetti package."
-    (interactive)
-    (if (equal olivetti-mode nil)
-        (progn
-          (window-configuration-to-register 1)
-          (delete-other-windows)
-          (text-scale-set 2)
-          (olivetti-mode t))
-      (progn
-        (if (eq (length (window-list)) 1)
-            (jump-to-register 1))
-        (olivetti-mode 0)
-        (text-scale-set 0))))
-
-  (use-package olivetti
-    :demand t
-    :bind
-    (("<f9>" . ews-distraction-free)))
-#+end_src
-
 * ОФОРМЛЕНИЕ
 ** FONTS
 Определение различных шрифтов, которые будет использовать Emacs.
@@ -528,6 +510,89 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
   (use-package rainbow-mode
     :diminish
     :hook org-mode prog-mode)
+#+end_src
+
+* Emacs Writing Studio
+** Olivetti-mode
+Добавляет возможность переключения в режим фокуса. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
+#+begin_src emacs-lisp
+  ;; Distraction-free writing
+  (defun ews-distraction-free ()
+    "Distraction-free writing environment using Olivetti package."
+    (interactive)
+    (if (equal olivetti-mode nil)
+        (progn
+          (window-configuration-to-register 1)
+          (delete-other-windows)
+          (text-scale-set 2)
+          (olivetti-mode t))
+      (progn
+        (if (eq (length (window-list)) 1)
+            (jump-to-register 1))
+        (olivetti-mode 0)
+        (text-scale-set 0))))
+
+  (use-package olivetti
+    :demand t
+    :bind
+    (("<f9>" . ews-distraction-free)))
+#+end_src
+
+** Note Drawers for org
+Добавляет drawers (заметку) в заголовок текущего раздела. Drawers не выводятся при конвертации org файлов в другой формат
+#+begin_src emacs-lisp
+  ;; Notes drawers
+  (defun ews-org-insert-notes-drawer ()
+    "Generate a NOTES drawer under the heading of the current or jump to an existing one."
+    (interactive)
+    (push-mark)
+    (org-previous-visible-heading 1)
+    (next-line 1)
+    (if (looking-at-p "^[ \t]*:NOTES:")
+        (progn
+          (re-search-forward "^[ \t]*:END:" nil t)
+          (previous-line)
+          (end-of-line)
+          (org-return))
+      (org-insert-drawer nil "NOTES"))
+    (message "Press C-u C-SPACE to return to previous position."))
+
+  (with-eval-after-load "org"
+    (define-key org-mode-map (kbd "C-c C-x n") #'ews-org-insert-notes-drawer))
+#+end_src
+** Проверка орфографии
+*** Flyspell
+Проверка орфографии с помощью утилиты hunspell
+
+#+begin_src emacs-lisp
+  ;; Spell checking
+  ;; Requires Hunspell
+  (use-package flyspell
+    :custom
+    (ispell-program-name "hunspell")
+    ;; (ispell-default-dictionary "ru_RU")
+    :hook (text-mode . flyspell-mode)
+    :bind (("M-<f7>" . flyspell-buffer)))
+
+  (use-package flyspell-correct
+    :after (flyspell)
+    :bind (("C-;" . flyspell-auto-correct-previous-word)
+           ("<f7>" . flyspell-correct-wrapper)))
+#+end_src
+
+*** Guess-language
+Определяет язык текста для работы Flyspell
+#+begin_src emacs-lisp
+  (use-package guess-language         ; Automatically detect language for Flyspell
+    :ensure t
+    :defer t
+    :init (add-hook 'text-mode-hook #'guess-language-mode)
+    :config
+    (setq guess-language-langcodes '((en . ("en_US" "English"))
+                                     (ru . ("ru_RU" "Russian")))
+          guess-language-languages '(en ru)
+          guess-language-min-paragraph-length 35)
+    :diminish guess-language-mode)
 #+end_src
 
 * УСТАНОВКИ КЛАВИШ

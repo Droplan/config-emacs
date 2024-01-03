@@ -8,7 +8,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(which-key vertico toc-org rainbow-mode rainbow-delimiters projectile org-bullets orderless markdown-mode magit lua-mode flycheck diminish dashboard consult company atom-one-dark-theme all-the-icons-dired)))
+   '(guess-language flyspell-correct olivetti which-key vertico toc-org rainbow-mode rainbow-delimiters projectile org-modern org-fragtog org-bullets org-appear orderless markdown-mode marginalia magit lua-mode flycheck diminish dashboard consult company-posframe atom-one-dark-theme all-the-icons-dired)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

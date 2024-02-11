@@ -217,7 +217,7 @@ Consult предоставляет команды поиска и навигац
 
     ;; Optionally make narrowing help available in the minibuffer.
     ;; You may want to use `embark-prefix-help-command' or which-key instead.
-    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+    (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
 
     ;; By default `consult-project-function' uses `project-root' from project.el.
     ;; Optionally configure a different project root function.
@@ -234,6 +234,46 @@ Consult предоставляет команды поиска и навигац
     ;; (setq consult-project-function nil)
     )
 #+end_src
+** Embark
+Добавляет множество дополнительных действий
+#+begin_src emacs-lisp
+  (use-package embark
+    :ensure t
+
+    :bind
+    (("C-." . embark-act)         ;; pick some comfortable binding
+     ("C-;" . embark-dwim)        ;; good alternative: M-.
+     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+    :init
+
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
+
+    ;; Show the Embark target at point via Eldoc. You may adjust the
+    ;; Eldoc strategy, if you want to see the documentation from
+    ;; multiple providers. Beware that using this can be a little
+    ;; jarring since the message shown in the minibuffer can be more
+    ;; than one line, causing the modeline to move up and down:
+
+    ;; (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+    :config
+
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
+
+  ;; Consult users will also want the embark-consult package.
+  (use-package embark-consult
+    :ensure t ; only need to install it, embark loads it after consult if found
+    :hook
+    (embark-collect-mode . consult-preview-at-point-mode))
+#+end_src
+
 ** Company
 Company is a text completion framework for Emacs. The name stands for “complete anything”. Completion will start automatically after you type a few letters. Use M-n and M-p to select, <return> to complete or <tab> to complete the common part.
 
@@ -256,14 +296,12 @@ Company is a text completion framework for Emacs. The name stands for “complet
   ;; Required for variable pitch
   ;; When using variable pitch fonts, the dropdown menu for text completion gets distorted because the letters are not all the same size
   (use-package company-posframe
-    :diminish
     :config
     (company-posframe-mode 1))
-#+end_src
+#+end_src 
 
 ** Flycheck
 Install =luacheck= from your Linux distro's repositories for flycheck to work correctly with lua files.  Install =python-pylint= for flycheck to work with python files. Haskell works with flycheck as long as =haskell-ghc= or =haskell-stack-ghc= is installed.  For more information on language support for flycheck, [[https://www.flycheck.org/en/latest/languages.html][read this]].
-
 #+begin_src emacs-lisp
   (use-package flycheck
     :defer t
@@ -291,7 +329,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
                 org-hide-emphasis-markers t       ;; Прячет символы разметки 
                 org-startup-with-inline-images t  ;; Включает превью для изображений
                 org-image-actual-width '(300))    ;; Устанавливает максимальную ширину изображений по умолчанию
- #+end_src
+#+end_src
 
 *** Org-appear
 Показывает маркеры разметки, когда курсор находится на слове
@@ -366,7 +404,6 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 * PROJECTILE
 [[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs.
 Для того, чтобы конкретная папка воспринималась как проект в ней или должна быть инициализирован git, либо в корне находится файл =.projectile=
-
 #+begin_src emacs-lisp
   (use-package projectile
     :config
@@ -507,13 +544,12 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 * Emacs Writing Studio
 Конфигурация [[https://lucidmanager.org/productivity/more-productive-with-emacs/][EWS]] затрагивает не только этот раздел, но и настройки use-package, org-mode, org-roam, автозавершения и несколько стандартных настроек
-Папки не задал, так как в них какая-то ошибка
 ** Org-roam
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
     (org-roam-directory (file-truename "~/Documents/notes")) ;; Задаёт путь к папке с org файлами
-    ;; (org-roam-completion-everywhere t) ;; Позволяет выполнять completion-at-point набрав несколько символов в любом месте файла
+    (org-roam-completion-everywhere t) ;; Позволяет выполнять completion-at-point набрав несколько символов в любом месте файла
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
            ("C-c n g" . org-roam-graph)
@@ -533,6 +569,43 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
     ;; If using org-roam-protocol
     ;; (require 'org-roam-protocol)
     )
+#+end_src
+*** Шаблоны Org-roam для заметок
+#+begin_src emacs-lisp
+  (setq org-roam-capture-templates
+        '(("d" "default" plain
+           "%?"
+           :target
+           (file+head "${slug}.org"
+                      "#+title: ${title}\n#+date: %u\n#+type: \n#+last_modified: %U\n\n")
+           :immediate-finish t)
+          ("b" "literature note" plain
+           "%?"
+           :target
+           (file+head
+            "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
+            "#+title: ${note-title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t)))
+
+#+end_src
+*** Org-roam буфер
+#+begin_src emacs-lisp
+  ;; Настройка содержания
+  (setq org-roam-mode-sections
+        (list #'org-roam-backlinks-section
+              #'org-roam-reflinks-section
+              #'org-roam-unlinked-references-section
+              ))
+
+  ;; Отображение буфера в боковой панели
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-side-window)
+                 (side . right)
+                 (slot . 0)
+                 (window-width . 0.33)
+                 (window-parameters . ((no-other-window . t)
+                                       (no-delete-other-windows . t)))))
 #+end_src
 
 ** Olivetti-mode
@@ -616,34 +689,76 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
           guess-language-min-paragraph-length 35)
     :diminish guess-language-mode)
 #+end_src
+** Библиография
+*** Bibtex-mode
+#+begin_src emacs-lisp
+  (use-package bibtex
+    :custom
+    (bibtex-dialect 'BibTeX)
+    (bibtex-user-optional-fields
+     '(("keywords" "Keywords to describe the entry" "")
+       ("file" "Link to a document file." "" )))
+    (bibtex-align-at-equal-sign t))
+#+end_src
+*** Citar
+#+begin_src emacs-lisp
+  (use-package citar
+    :no-require
+    :custom
+    (org-cite-global-bibliography 
+     (directory-files "~/Documents/library/" t "^[A-Z|a-z|0-9].+.bib$"))
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar)
+    (citar-bibliography org-cite-global-bibliography)
+    ;; optional: org-cite-insert is also bound to C-c C-x C-@
+    :bind
+    (:map org-mode-map :package org ("C-c b" . #'org-cite-insert)))
+
+  (use-package citar-embark
+    :after citar embark
+    :no-require
+    :config (citar-embark-mode))
+    #+end_src
+*** Citar-Org-Roam
+Интеграция citar и org-roam
+#+begin_src emacs-lisp
+  (use-package citar-org-roam
+    :after (citar org-roam)
+    :config
+    (citar-org-roam-mode)
+    (setq citar-org-roam-note-title-template "${author} - ${title}") ;; устанавливает заголовк для библиографических заметок
+    (setq citar-org-roam-capture-template-key "b") ;; устанавливает шаблон для библиографических заметок
+    )
+#+end_src
 
 ** Проверка установки в системе программ
 Выводит в буфере *Message* сообщения об отсутствии установки прогамм в системе для различных действий
 #+begin_src emacs-lisp
-      ;; Check for missing executables
-      (defun ews-missing-executables (prog-list)
-        "Identified missing executables in PROG-LIST.
+  ;; Check for missing executables
+  (defun ews-missing-executables (prog-list)
+    "Identified missing executables in PROG-LIST.
 
-      Sublists indicate that one of the entries is required."
-        (require 'cl-lib)
-        (let ((missing '()))
-          (dolist (exec prog-list)
-            (if (listp exec)
-                (unless (cl-some #'executable-find exec)
-                  (push (format "(%s)" (mapconcat 'identity exec " or ")) missing))
-              (unless (executable-find exec)
-                (push exec missing))))
-          (if missing
-              (user-error "Missing executable files(s): %s"
-                          (mapconcat 'identity missing ", ")))))
+  Sublists indicate that one of the entries is required."
+    (require 'cl-lib)
+    (let ((missing '()))
+      (dolist (exec prog-list)
+        (if (listp exec)
+            (unless (cl-some #'executable-find exec)
+              (push (format "(%s)" (mapconcat 'identity exec " or ")) missing))
+          (unless (executable-find exec)
+            (push exec missing))))
+      (if missing
+          (user-error "Missing executable files(s): %s"
+                      (mapconcat 'identity missing ", ")))))
 
-      (ews-missing-executables
-       '("onlyoffice" "zip" "pdftotext" "ddjvu"
-         ("convert" "gm") "exiftool" "latex" "curl"
-         "hunspell" ;; Spellcheck
-         ("grep" "ripgrep") ;; Search files
-         ("gs" "mutool") ;; PDF
-         ("mpg321" "ogg123" "mplayer" "mpv" "vlc"))) ;; Play music
+  (ews-missing-executables
+   '("onlyoffice" "zip" "pdftotext" "ddjvu"
+     ("convert" "gm") "exiftool" "latex" "curl"
+     "hunspell" ;; Spellcheck
+     ("grep" "ripgrep") ;; Search files
+     ("gs" "mutool") ;; PDF
+     ("mpg321" "ogg123" "mplayer" "mpv" "vlc"))) ;; Play music
 #+end_src
 * УСТАНОВКИ КЛАВИШ
 Отображение последних открытых файлов
@@ -660,6 +775,8 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
   (tool-bar-mode -1)           ;; Disable the tool bar
   (scroll-bar-mode -1)         ;; Disable the scroll bar
   ;; (tab-bar-mode t)             ;; Позволяет пользоваться вкладками C-x t 2, переключение вперёд на C-x TAB, назад C-SHIFT-TAB, закрыть C-x t 0
+
+  (setq calendar-week-start-day 1) ;; Устанавливает началом недели понедельник
 
   (global-display-line-numbers-mode t) ;; Отображает номера строк
 

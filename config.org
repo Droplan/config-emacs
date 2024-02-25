@@ -345,19 +345,12 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
   (use-package org-modern
     :hook
     (org-mode . global-org-modern-mode)
-    :custom
+    ;; :custom
     ;; (org-modern-keyword nil)
     ;; (org-modern-checkbox nil)
     ;; (org-modern-table nil)
-    (org-modern-star nil)) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно
-#+end_src
-
-*** Org-bullets
-Меняет звёздочки на маркеры заголовков, в отличие от Org-modern он не изменяет отступы слева между заголовками
-#+begin_src emacs-lisp
-  (add-hook 'org-mode-hook 'org-indent-mode)
-  (use-package org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+    ;; (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно, решил через установку отступа
+    )
 #+end_src
 
 *** TOC
@@ -793,4 +786,6 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
   (put 'upcase-region 'disabled nil) ;; Включает команду преобразования в верхний регистр по C-x C-u
   (put 'downcase-region 'disabled nil) ;; Включает команду преобразования в нижний регистр по C-x C-l
   (put 'narrow-to-region 'disabled nil) ;; Включает сужение, аналог zoom в logseq, выделенного региона по C-x n n
+
+  (org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
 #+end_src

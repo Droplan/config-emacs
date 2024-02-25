@@ -8,7 +8,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(company-show-quick-access t nil nil "Customized with use-package company")
- '(org-indent-indentation-per-level 4)
  '(package-selected-packages
    '(guess-language flyspell-correct olivetti which-key vertico toc-org rainbow-mode rainbow-delimiters projectile org-modern org-fragtog org-bullets org-appear orderless markdown-mode marginalia magit lua-mode flycheck diminish dashboard consult company-posframe atom-one-dark-theme all-the-icons-dired)))
 (custom-set-faces

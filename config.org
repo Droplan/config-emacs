@@ -319,7 +319,15 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
                 ("C-c C-e" . markdown-do)))
 #+end_src
 
-** ORG MODE
+** LANGUAGE SUPPORT
+Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM, AWK, C, C++, Fortran, Icon, IDL (CORBA), IDLWAVE, Java, Javascript, M4, Makefiles, Metafont, Modula2, Object Pascal, Objective-C, Octave, Pascal, Perl, Pike, PostScript, Prolog, Python, Ruby, Simula, SQL, Tcl, Verilog, and VHDL. Other languages will require you to install additional modes.
+
+#+begin_src emacs-lisp
+  (use-package lua-mode)
+#+end_src
+
+* Заметки, задачи, библиография
+** Org-mode
 *** Стандартные настройки
 #+begin_src emacs-lisp
   ;; Improve org mode looks
@@ -340,7 +348,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
 #+end_src
 
 *** Org-modern
-Меняет символы разметки на более красивыми
+Меняет символы разметки на более красивыe
 #+begin_src emacs-lisp
   (use-package org-modern
     :hook
@@ -349,7 +357,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
     ;; (org-modern-keyword nil)
     ;; (org-modern-checkbox nil)
     ;; (org-modern-table nil)
-    ;; (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно, решил через установку отступа
+    ;; (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно. Решил через установку отступа
     )
 #+end_src
 
@@ -380,11 +388,211 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
      (plist-put org-format-latex-options :background 'auto)))
 #+end_src
 
-** LANGUAGE SUPPORT
-Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM, AWK, C, C++, Fortran, Icon, IDL (CORBA), IDLWAVE, Java, Javascript, M4, Makefiles, Metafont, Modula2, Object Pascal, Objective-C, Octave, Pascal, Perl, Pike, PostScript, Prolog, Python, Ruby, Simula, SQL, Tcl, Verilog, and VHDL. Other languages will require you to install additional modes.
+** Org-roam
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :custom
+    (org-roam-directory (file-truename "~/Documents/notes")) ;; Задаёт путь к папке с org файлами
+    (org-roam-completion-everywhere t) ;; Позволяет выполнять completion-at-point набрав несколько символов в любом месте файла
+    :bind (("C-c n l" . org-roam-buffer-toggle)
+           ("C-c n f" . org-roam-node-find)
+           ("C-c n g" . org-roam-graph)
+           ("C-c n i" . org-roam-node-insert)
+           ("C-c n c" . org-roam-capture)
+           ("C-c n j" . org-roam-dailies-capture-today)
+           ("C-c n r" . org-roam-node-random)
+           ("C-c n o" . org-id-get-create)
+           ("C-c n t" . org-roam-tag-add)
+           ("C-c n a" . org-roam-alias-add)
+           :map org-mode-map
+           ("C-M-i" . completion-at-point))
+    :config
+    ;; If you're using a vertical completion framework, you might want a more informative completion interface
+    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag))) ;; Настройка отображения заметок при вертикальном завершении
+    (org-roam-db-autosync-mode) ;; Включает постоянное кеширование изменённых файлов
+    ;; If using org-roam-protocol
+    ;; (require 'org-roam-protocol)
+    )
+#+end_src
+*** Шаблоны Org-roam для заметок
+#+begin_src emacs-lisp
+  (setq org-roam-capture-templates
+        '(("d" "default" plain
+           "%?"
+           :target
+           (file+head "${slug}.org"
+                      "#+title: ${title}\n#+date: %u\n#+type: \n#+last_modified: %U\n\n")
+           :immediate-finish t)
+          ("b" "literature note" plain
+           "%?"
+           :target
+           (file+head
+            "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
+            "#+title: ${note-title}\n#+created: %U\n#+last_modified: %U\n\n")
+           :unnarrowed t)))
+
+#+end_src
+*** Org-roam буфер
+#+begin_src emacs-lisp
+  ;; Настройка содержания
+  (setq org-roam-mode-sections
+        (list #'org-roam-backlinks-section
+              #'org-roam-reflinks-section
+              #'org-roam-unlinked-references-section
+              ))
+
+  ;; Отображение буфера в боковой панели
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-side-window)
+                 (side . right)
+                 (slot . 0)
+                 (window-width . 0.33)
+                 (window-parameters . ((no-other-window . t)
+                                       (no-delete-other-windows . t)))))
+#+end_src
+
+** Org-agenda
+#+begin_src emacs-lisp
+  (setq org-agenda-files (directory-files "~/Documents/notes/" t "^[A-Z|a-z|А-Я|а-я|0-9].+.org$"))
+
+  (setq org-agenda-custom-commands
+        '(("v" "A better agenda view"
+           ((tags "PRIORITY=\"A\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "High-priority unfinished tasks:")))
+            (tags "PRIORITY=\"B\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "Medium-priority unfinished tasks:")))
+            (tags "PRIORITY=\"C\""
+                  ((org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                   (org-agenda-overriding-header "Low-priority unfinished tasks:")))
+            (agenda "")
+            (alltodo "")))))
+#+end_src
+
+** Olivetti-mode
+Добавляет возможность переключения в режим фокуса. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
+#+begin_src emacs-lisp
+  ;; Distraction-free writing
+  (defun ews-distraction-free ()
+    "Distraction-free writing environment using Olivetti package."
+    (interactive)
+    (if (equal olivetti-mode nil)
+        (progn
+          (window-configuration-to-register 1)
+          (delete-other-windows)
+          (text-scale-set 2)
+          (olivetti-mode t))
+      (progn
+        (if (eq (length (window-list)) 1)
+            (jump-to-register 1))
+        (olivetti-mode 0)
+        (text-scale-set 0))))
+
+  (use-package olivetti
+    :demand t
+    :bind
+    (("<f9>" . ews-distraction-free)))
+#+end_src
+
+** Note Drawers for org
+Добавляет drawers (заметку) в заголовок текущего раздела. Drawers не выводятся при конвертации org файлов в другой формат
+#+begin_src emacs-lisp
+  ;; Notes drawers
+  (defun ews-org-insert-notes-drawer ()
+    "Generate a NOTES drawer under the heading of the current or jump to an existing one."
+    (interactive)
+    (push-mark)
+    (org-previous-visible-heading 1)
+    (next-line 1)
+    (if (looking-at-p "^[ \t]*:NOTES:")
+        (progn
+          (re-search-forward "^[ \t]*:END:" nil t)
+          (previous-line)
+          (end-of-line)
+          (org-return))
+      (org-insert-drawer nil "NOTES"))
+    (message "Press C-u C-SPACE to return to previous position."))
+
+  (with-eval-after-load "org"
+    (define-key org-mode-map (kbd "C-c C-x n") #'ews-org-insert-notes-drawer))
+#+end_src
+** Проверка орфографии
+*** Flyspell
+Проверка орфографии с помощью утилиты hunspell
 
 #+begin_src emacs-lisp
-  (use-package lua-mode)
+  ;; Spell checking
+  ;; Requires Hunspell
+  (use-package flyspell
+    :custom
+    (ispell-program-name "hunspell")
+    ;; (ispell-default-dictionary "ru_RU")
+    :hook (text-mode . flyspell-mode)
+    :bind (("M-<f7>" . flyspell-buffer)))
+
+  (use-package flyspell-correct
+    :after (flyspell)
+    :bind (("C-;" . flyspell-auto-correct-previous-word)
+           ("<f7>" . flyspell-correct-wrapper)))
+#+end_src
+
+*** Guess-language
+Определяет язык текста для работы Flyspell
+#+begin_src emacs-lisp
+  (use-package guess-language         ; Automatically detect language for Flyspell
+    :ensure t
+    :defer t
+    :init (add-hook 'text-mode-hook #'guess-language-mode)
+    :config
+    (setq guess-language-langcodes '((en . ("en_US" "English"))
+                                     (ru . ("ru_RU" "Russian")))
+          guess-language-languages '(en ru)
+          guess-language-min-paragraph-length 35)
+    :diminish guess-language-mode)
+#+end_src
+** Библиография
+*** Bibtex-mode
+#+begin_src emacs-lisp
+  (use-package bibtex
+    :custom
+    (bibtex-dialect 'BibTeX)
+    (bibtex-user-optional-fields
+     '(("keywords" "Keywords to describe the entry" "")
+       ("file" "Link to a document file." "" )))
+    (bibtex-align-at-equal-sign t))
+#+end_src
+*** Citar
+#+begin_src emacs-lisp
+  (use-package citar
+    :no-require
+    :custom
+    (org-cite-global-bibliography 
+     (directory-files "~/Documents/library/" t "^[A-Z|a-z|0-9].+.bib$"))
+    (org-cite-insert-processor 'citar)
+    (org-cite-follow-processor 'citar)
+    (org-cite-activate-processor 'citar)
+    (citar-bibliography org-cite-global-bibliography)
+    ;; optional: org-cite-insert is also bound to C-c C-x C-@
+    :bind
+    (:map org-mode-map :package org ("C-c b" . #'org-cite-insert)))
+
+  (use-package citar-embark
+    :after citar embark
+    :no-require
+    :config (citar-embark-mode))
+    #+end_src
+*** Citar-Org-Roam
+Интеграция citar и org-roam
+#+begin_src emacs-lisp
+  (use-package citar-org-roam
+    :after (citar org-roam)
+    :config
+    (citar-org-roam-mode)
+    (setq citar-org-roam-note-title-template "${author} - ${title}") ;; устанавливает заголовк для библиографических заметок
+    (setq citar-org-roam-capture-template-key "b") ;; устанавливает шаблон для библиографических заметок
+    )
 #+end_src
 
 * GIT
@@ -537,194 +745,6 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 
 * Emacs Writing Studio
 Конфигурация [[https://lucidmanager.org/productivity/more-productive-with-emacs/][EWS]] затрагивает не только этот раздел, но и настройки use-package, org-mode, org-roam, автозавершения и несколько стандартных настроек
-** Org-roam
-#+begin_src emacs-lisp
-  (use-package org-roam
-    :custom
-    (org-roam-directory (file-truename "~/Documents/notes")) ;; Задаёт путь к папке с org файлами
-    (org-roam-completion-everywhere t) ;; Позволяет выполнять completion-at-point набрав несколько символов в любом месте файла
-    :bind (("C-c n l" . org-roam-buffer-toggle)
-           ("C-c n f" . org-roam-node-find)
-           ("C-c n g" . org-roam-graph)
-           ("C-c n i" . org-roam-node-insert)
-           ("C-c n c" . org-roam-capture)
-           ("C-c n j" . org-roam-dailies-capture-today)
-           ("C-c n r" . org-roam-node-random)
-           ("C-c n o" . org-id-get-create)
-           ("C-c n t" . org-roam-tag-add)
-           ("C-c n a" . org-roam-alias-add)
-           :map org-mode-map
-           ("C-M-i" . completion-at-point))
-    :config
-    ;; If you're using a vertical completion framework, you might want a more informative completion interface
-    (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag))) ;; Настройка отображения заметок при вертикальном завершении
-    (org-roam-db-autosync-mode) ;; Включает постоянное кеширование изменённых файлов
-    ;; If using org-roam-protocol
-    ;; (require 'org-roam-protocol)
-    )
-#+end_src
-*** Шаблоны Org-roam для заметок
-#+begin_src emacs-lisp
-  (setq org-roam-capture-templates
-        '(("d" "default" plain
-           "%?"
-           :target
-           (file+head "${slug}.org"
-                      "#+title: ${title}\n#+date: %u\n#+type: \n#+last_modified: %U\n\n")
-           :immediate-finish t)
-          ("b" "literature note" plain
-           "%?"
-           :target
-           (file+head
-            "%(expand-file-name (or citar-org-roam-subdir \"\") org-roam-directory)/${citar-citekey}.org"
-            "#+title: ${note-title}\n#+created: %U\n#+last_modified: %U\n\n")
-           :unnarrowed t)))
-
-#+end_src
-*** Org-roam буфер
-#+begin_src emacs-lisp
-  ;; Настройка содержания
-  (setq org-roam-mode-sections
-        (list #'org-roam-backlinks-section
-              #'org-roam-reflinks-section
-              #'org-roam-unlinked-references-section
-              ))
-
-  ;; Отображение буфера в боковой панели
-  (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
-                 (display-buffer-in-side-window)
-                 (side . right)
-                 (slot . 0)
-                 (window-width . 0.33)
-                 (window-parameters . ((no-other-window . t)
-                                       (no-delete-other-windows . t)))))
-#+end_src
-
-** Olivetti-mode
-Добавляет возможность переключения в режим фокуса. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
-#+begin_src emacs-lisp
-  ;; Distraction-free writing
-  (defun ews-distraction-free ()
-    "Distraction-free writing environment using Olivetti package."
-    (interactive)
-    (if (equal olivetti-mode nil)
-        (progn
-          (window-configuration-to-register 1)
-          (delete-other-windows)
-          (text-scale-set 2)
-          (olivetti-mode t))
-      (progn
-        (if (eq (length (window-list)) 1)
-            (jump-to-register 1))
-        (olivetti-mode 0)
-        (text-scale-set 0))))
-
-  (use-package olivetti
-    :demand t
-    :bind
-    (("<f9>" . ews-distraction-free)))
-#+end_src
-
-** Note Drawers for org
-Добавляет drawers (заметку) в заголовок текущего раздела. Drawers не выводятся при конвертации org файлов в другой формат
-#+begin_src emacs-lisp
-  ;; Notes drawers
-  (defun ews-org-insert-notes-drawer ()
-    "Generate a NOTES drawer under the heading of the current or jump to an existing one."
-    (interactive)
-    (push-mark)
-    (org-previous-visible-heading 1)
-    (next-line 1)
-    (if (looking-at-p "^[ \t]*:NOTES:")
-        (progn
-          (re-search-forward "^[ \t]*:END:" nil t)
-          (previous-line)
-          (end-of-line)
-          (org-return))
-      (org-insert-drawer nil "NOTES"))
-    (message "Press C-u C-SPACE to return to previous position."))
-
-  (with-eval-after-load "org"
-    (define-key org-mode-map (kbd "C-c C-x n") #'ews-org-insert-notes-drawer))
-#+end_src
-** Проверка орфографии
-*** Flyspell
-Проверка орфографии с помощью утилиты hunspell
-
-#+begin_src emacs-lisp
-  ;; Spell checking
-  ;; Requires Hunspell
-  (use-package flyspell
-    :custom
-    (ispell-program-name "hunspell")
-    ;; (ispell-default-dictionary "ru_RU")
-    :hook (text-mode . flyspell-mode)
-    :bind (("M-<f7>" . flyspell-buffer)))
-
-  (use-package flyspell-correct
-    :after (flyspell)
-    :bind (("C-;" . flyspell-auto-correct-previous-word)
-           ("<f7>" . flyspell-correct-wrapper)))
-#+end_src
-
-*** Guess-language
-Определяет язык текста для работы Flyspell
-#+begin_src emacs-lisp
-  (use-package guess-language         ; Automatically detect language for Flyspell
-    :ensure t
-    :defer t
-    :init (add-hook 'text-mode-hook #'guess-language-mode)
-    :config
-    (setq guess-language-langcodes '((en . ("en_US" "English"))
-                                     (ru . ("ru_RU" "Russian")))
-          guess-language-languages '(en ru)
-          guess-language-min-paragraph-length 35)
-    :diminish guess-language-mode)
-#+end_src
-** Библиография
-*** Bibtex-mode
-#+begin_src emacs-lisp
-  (use-package bibtex
-    :custom
-    (bibtex-dialect 'BibTeX)
-    (bibtex-user-optional-fields
-     '(("keywords" "Keywords to describe the entry" "")
-       ("file" "Link to a document file." "" )))
-    (bibtex-align-at-equal-sign t))
-#+end_src
-*** Citar
-#+begin_src emacs-lisp
-  (use-package citar
-    :no-require
-    :custom
-    (org-cite-global-bibliography 
-     (directory-files "~/Documents/library/" t "^[A-Z|a-z|0-9].+.bib$"))
-    (org-cite-insert-processor 'citar)
-    (org-cite-follow-processor 'citar)
-    (org-cite-activate-processor 'citar)
-    (citar-bibliography org-cite-global-bibliography)
-    ;; optional: org-cite-insert is also bound to C-c C-x C-@
-    :bind
-    (:map org-mode-map :package org ("C-c b" . #'org-cite-insert)))
-
-  (use-package citar-embark
-    :after citar embark
-    :no-require
-    :config (citar-embark-mode))
-    #+end_src
-*** Citar-Org-Roam
-Интеграция citar и org-roam
-#+begin_src emacs-lisp
-  (use-package citar-org-roam
-    :after (citar org-roam)
-    :config
-    (citar-org-roam-mode)
-    (setq citar-org-roam-note-title-template "${author} - ${title}") ;; устанавливает заголовк для библиографических заметок
-    (setq citar-org-roam-capture-template-key "b") ;; устанавливает шаблон для библиографических заметок
-    )
-#+end_src
-
 ** Проверка установки в системе программ
 Выводит в буфере *Message* сообщения об отсутствии установки прогамм в системе для различных действий
 #+begin_src emacs-lisp
@@ -787,5 +807,5 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
   (put 'downcase-region 'disabled nil) ;; Включает команду преобразования в нижний регистр по C-x C-l
   (put 'narrow-to-region 'disabled nil) ;; Включает сужение, аналог zoom в logseq, выделенного региона по C-x n n
 
-  (org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
+  (setq org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
 #+end_src

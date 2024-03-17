@@ -1,4 +1,4 @@
-#+TITLE: AM's GNU Emacs Config
+#+TITLE: AM's GNU Emacs Con fig
 #+AUTHOR: Aleksey Malkov
 #+DESCRIPTION: AM's personal Emacs config.
 
@@ -454,8 +454,15 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
 ** Org-agenda
 #+begin_src emacs-lisp
-  (setq org-agenda-files (directory-files "~/Documents/notes/" t "^[A-Z|a-z|А-Я|а-я|0-9].+.org$"))
+  ;; (setq org-agenda-files '("~/Documents/notes/"))
+  ;; (setq org-agenda-files '("~/Documents/notes/daily"))
+  ;; (setq org-agenda-files (directory-files-recursively "~/Documents/notes/" "\\.org$"))
 
+  ;; Убирает из agenda заголовки без TODO
+  (setq org-agenda-skip-function-global 
+        '(org-agenda-skip-entry-if 'nottodo '("TODO")))
+
+  ;; Добавляет альтернативные виды для повестки дня
   (setq org-agenda-custom-commands
         '(("v" "A better agenda view"
            ((tags "PRIORITY=\"A\""
@@ -471,6 +478,37 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
             (alltodo "")))))
 #+end_src
 
+** Org-agenda-files-track
+Автоматически добавляет и удаляет файлы в org-agenda-files
+#+begin_src emacs-lisp
+  (use-package org-agenda-files-track
+  :hook (org-mode . org-agenda-files-track-mode)
+  ) ;; не работает почему-то, но функция ниже спасает
+
+  ;; Функция для прохода по файлам org в указанной папке и добавления файлов с задачами в org-agenda-files
+  (defun my/org-agenda-files-track-init ()
+    "(Re)initialize dynamic agenda files.
+
+              This can take a long time, so it is recommended to run this only
+              on installation and when first tasks are added to many files via
+              methods the save hook cannot detect, like file synchronization."
+    (interactive)
+    ;; ;; uncomment if storing org-agenda-files in file
+    ;; (make-empty-file org-agenda-files 'force)g
+    (org-store-new-agenda-file-list
+     (directory-files-recursively
+      "~/Documents/notes" (rx ".org" eos) nil
+      ;; ignore hidden directories like .git and .attach
+      (lambda (subdir)
+        (not (eq ?. (string-to-char (file-name-nondirectory subdir)))))))
+    ;; use ql here if desired
+    (org-agenda-files-track-cleanup-files 'full)
+    (message "Initialized agenda files"))
+
+  ;; Присвоение org-agenda-files одного имени файла, чтобы сохранить org-agenda-files в сеансах Emacs
+  ;;(setq org-agenda-files
+    ;;    (expand-file-name "org-agenda-files.txt" (xdg-cache-home)))
+#+end_src
 ** Olivetti-mode
 Добавляет возможность переключения в режим фокуса. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
 #+begin_src emacs-lisp

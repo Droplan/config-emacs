@@ -815,9 +815,29 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
 Отображение последних открытых файлов
 #+begin_src emacs-lisp
   (recentf-mode t)                ;; Позволяет запоминать последние открытые файлы
-  (global-set-key "\C-x\ \C-g" 'recentf-open-files)
+  ;; (global-set-key "\C-x\ \C-g" 'recentf-open-files) ;; Не удобно, так как после ошибочно нажатого префикса нельзя просто так прервать, да и dashboard пользуюсь
 #+end_src
+* REVERSE-IM
+Ввод команд для Emacs на альтернативном языке. Должен располагаться после установки всех хоткеев.
+#+begin_src emacs-lisp
+  ;; Needed for `:after char-fold' to work
+  (use-package char-fold
+    :custom
+    (char-fold-symmetric t)
+    (search-default-mode #'char-fold-to-regexp))
 
+  (use-package reverse-im
+    :demand t ; always load it
+    :after char-fold ; but only after `char-fold' is loaded
+    :bind
+    ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
+    :custom
+    (reverse-im-char-fold t) ; use lax matching
+    (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+    (reverse-im-input-methods '("russian-computer")) ; translate these methods
+    :config
+    (reverse-im-mode t)) ; turn the mode on
+#+end_src
 * УСТАНОВКА ЗНАЧЕНИЙ ПЕРЕМЕННЫХ
 Настройка Emacs изменением стандартных переменных
 

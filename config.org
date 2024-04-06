@@ -296,6 +296,7 @@ Company is a text completion framework for Emacs. The name stands for “complet
   ;; Required for variable pitch
   ;; When using variable pitch fonts, the dropdown menu for text completion gets distorted because the letters are not all the same size
   (use-package company-posframe
+    :diminish
     :config
     (company-posframe-mode 1))
 #+end_src 
@@ -645,6 +646,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 Для того, чтобы конкретная папка воспринималась как проект в ней или должна быть инициализирован git, либо в корне находится файл =.projectile=
 #+begin_src emacs-lisp
   (use-package projectile
+    :diminish
     :config
     (projectile-mode 1))
 #+end_src
@@ -681,8 +683,13 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+end_src
 
 ** DASHBOARD
-Emacs Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
+Emacs Dashboard расширяемый начальный экран, отображающий последние файлы, закладки, задачи
 
+#+begin_src emacs-lisp
+(recentf-mode t) ;; Позволяет запоминать последние открытые файлы
+#+end_src
+
+Конфигурация для dashboard
 #+begin_src emacs-lisp
   (use-package dashboard
     :init
@@ -811,12 +818,7 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
      ("gs" "mutool") ;; PDF
      ("mpg321" "ogg123" "mplayer" "mpv" "vlc"))) ;; Play music
 #+end_src
-* УСТАНОВКИ КЛАВИШ
-Отображение последних открытых файлов
-#+begin_src emacs-lisp
-  (recentf-mode t)                ;; Позволяет запоминать последние открытые файлы
-  ;; (global-set-key "\C-x\ \C-g" 'recentf-open-files) ;; Не удобно, так как после ошибочно нажатого префикса нельзя просто так прервать, да и dashboard пользуюсь
-#+end_src
+
 * REVERSE-IM
 Ввод команд для Emacs на альтернативном языке. Должен располагаться после установки всех хоткеев.
 #+begin_src emacs-lisp
@@ -833,7 +835,7 @@ Emacs Dashboard is an extensible startup screen showing you recent files, bookma
     ("M-T" . reverse-im-translate-word) ; fix a word in wrong layout
     :custom
     (reverse-im-char-fold t) ; use lax matching
-    (reverse-im-read-char-advice-function #'reverse-im-read-char-include)
+    (reverse-im-read-char-advice-function #'reverse-im-read-char-exclude)
     (reverse-im-input-methods '("russian-computer")) ; translate these methods
     :config
     (reverse-im-mode t)) ; turn the mode on

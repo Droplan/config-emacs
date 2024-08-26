@@ -599,23 +599,6 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     :diminish guess-language-mode)
 #+end_src
 
-*** Перебор языков при проверке
-Почему-то emacs крашится на коде ниже пока оставил вариант с guess-language
-
-#+begin_src emacs-lisp
-  ;;  (defvar mu-languages-ring nil "Languages ring for Ispell")
-  ;;
-  ;;  (let ((languages '("en_US" "ru_RU")))
-  ;;    (validate-setq mu-languages-ring (make-ring (length languages)))
-  ;;    (dolist (elem languages) (ring-insert mu-languages-ring elem)))
-  ;;
-  ;;  (defun mu-cycle-ispell-languages ()
-  ;;    (interactive)
-  ;;    (let ((language (ring-ref mu-languages-ring -1)))
-  ;;      (ring-insert mu-languages-ring language)
-  ;;      (ispell-change-dictionary language)))
-#+end_src
-
 ** Библиография
 *** Bibtex-mode
 #+begin_src emacs-lisp
@@ -666,16 +649,6 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 [[https://magit.vc/manual/][Magit]] is a full-featured git client for Emacs.
 #+begin_src emacs-lisp
   (use-package magit)
-#+end_src
-
-* Projectile
-[[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs.
-Для того, чтобы конкретная папка воспринималась как проект в ней или должна быть инициализирован git, либо в корне находится файл =.projectile=
-#+begin_src emacs-lisp
-  (use-package projectile
-    :diminish
-    :config
-    (projectile-mode 1))
 #+end_src
 
 * Удобство

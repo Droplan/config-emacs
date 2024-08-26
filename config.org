@@ -1,4 +1,4 @@
-#+TITLE: AM's GNU Emacs Con fig
+#+TITLE: AM's GNU Emacs Config
 #+AUTHOR: Aleksey Malkov
 #+DESCRIPTION: AM's personal Emacs config.
 
@@ -328,16 +328,18 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+end_src
 
 * Заметки, задачи, библиография
-** Org-mode
+** Org-mod
 *** Стандартные настройки
 #+begin_src emacs-lisp
   ;; Improve org mode looks
-  (setq-default org-startup-indented t            ;; Удаляет лишние звёзды заголовков, устанавливает отступ у заголовков и текста в них
-                org-pretty-entities t             ;; Отображает надстрочные и подстрочные символы, буквы греческого алфавита написанные как в LaTeX
-                org-use-sub-superscripts "{}"     ;; Запрещает показывать надстрочные и подстрочные симовлы, если они не обёрнуты в фигурные скобки
-                org-hide-emphasis-markers t       ;; Прячет символы разметки 
-                org-startup-with-inline-images t  ;; Включает превью для изображений
-                org-image-actual-width '(300))    ;; Устанавливает максимальную ширину изображений по умолчанию
+  (setq-default 
+   org-startup-indented t            ;; Удаляет лишние звёзды заголовков, устанавливает отступ у заголовков и текста в них
+   org-pretty-entities t             ;; Отображает надстрочные и подстрочные символы, буквы греческого алфавита написанные как в LaTeX
+   org-use-sub-superscripts "{}"     ;; Запрещает показывать надстрочные и подстрочные симовлы, если они не обёрнуты в фигурные скобки
+   org-hide-emphasis-markers t       ;; Прячет символы разметки 
+   org-startup-with-inline-images t  ;; Включает превью для изображений
+   org-image-actual-width '(300)    ;; Устанавливает максимальную ширину изображений по умолчанию
+   )
 #+end_src
 
 *** Org-appear
@@ -354,11 +356,12 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
   (use-package org-modern
     :hook
     (org-mode . global-org-modern-mode)
-    ;; :custom
+    :custom
     ;; (org-modern-keyword nil)
     ;; (org-modern-checkbox nil)
     ;; (org-modern-table nil)
-    (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно
+    (org-modern-star t) ;; красивые булеты для заголовков
+    (org-modern-hide-stars nil) ;; не скрывает звёзды заголовков, даёт более красивое выравнивание при использовании org-startup-indented t
     )
 #+end_src
 
@@ -483,8 +486,8 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 Автоматически добавляет и удаляет файлы в org-agenda-files
 #+begin_src emacs-lisp
   (use-package org-agenda-files-track
-  :hook (org-mode . org-agenda-files-track-mode)
-  ) ;; не работает почему-то, но функция ниже спасает
+    :hook (org-mode . org-agenda-files-track-mode)
+    ) ;; не работает почему-то, но функция ниже спасает
 
   ;; Функция для прохода по файлам org в указанной папке и добавления файлов с задачами в org-agenda-files
   (defun my/org-agenda-files-track-init ()
@@ -508,8 +511,9 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
   ;; Присвоение org-agenda-files одного имени файла, чтобы сохранить org-agenda-files в сеансах Emacs
   ;;(setq org-agenda-files
-    ;;    (expand-file-name "org-agenda-files.txt" (xdg-cache-home)))
+  ;;    (expand-file-name "org-agenda-files.txt" (xdg-cache-home)))
 #+end_src
+
 ** Olivetti-mode
 Добавляет возможность переключения в режим фокуса. Закрываются все буферы, кроме текущего, текущий буфер центрируется по центру, текст увеличивается, ширина буфера ограничивается
 #+begin_src emacs-lisp
@@ -580,10 +584,10 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+end_src
 
 *** Guess-language
-Определяет язык текста для работы Flyspell
+Определяет язык текста абзаца для работы Flyspell
 
 #+begin_src emacs-lisp
-  (use-package guess-language         ; Automatically detect language for Flyspell
+  (use-package guess-language
     :ensure t
     :defer t
     :init (add-hook 'text-mode-hook #'guess-language-mode)
@@ -599,18 +603,19 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 Почему-то emacs крашится на коде ниже пока оставил вариант с guess-language
 
 #+begin_src emacs-lisp
-;;  (defvar mu-languages-ring nil "Languages ring for Ispell")
-;;
-;;  (let ((languages '("en_US" "ru_RU")))
-;;    (validate-setq mu-languages-ring (make-ring (length languages)))
-;;    (dolist (elem languages) (ring-insert mu-languages-ring elem)))
-;;
-;;  (defun mu-cycle-ispell-languages ()
-;;    (interactive)
-;;    (let ((language (ring-ref mu-languages-ring -1)))
-;;      (ring-insert mu-languages-ring language)
-;;      (ispell-change-dictionary language)))
+  ;;  (defvar mu-languages-ring nil "Languages ring for Ispell")
+  ;;
+  ;;  (let ((languages '("en_US" "ru_RU")))
+  ;;    (validate-setq mu-languages-ring (make-ring (length languages)))
+  ;;    (dolist (elem languages) (ring-insert mu-languages-ring elem)))
+  ;;
+  ;;  (defun mu-cycle-ispell-languages ()
+  ;;    (interactive)
+  ;;    (let ((language (ring-ref mu-languages-ring -1)))
+  ;;      (ring-insert mu-languages-ring language)
+  ;;      (ispell-change-dictionary language)))
 #+end_src
+
 ** Библиография
 *** Bibtex-mode
 #+begin_src emacs-lisp
@@ -622,6 +627,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
        ("file" "Link to a document file." "" )))
     (bibtex-align-at-equal-sign t))
 #+end_src
+
 *** Citar
 #+begin_src emacs-lisp
   (use-package citar
@@ -641,7 +647,8 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     :after citar embark
     :no-require
     :config (citar-embark-mode))
-    #+end_src
+#+end_src
+
 *** Citar-Org-Roam
 Интеграция citar и org-roam
 #+begin_src emacs-lisp
@@ -706,7 +713,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 Emacs Dashboard расширяемый начальный экран, отображающий последние файлы, закладки, задачи
 
 #+begin_src emacs-lisp
-(recentf-mode t) ;; Позволяет запоминать последние открытые файлы
+  (recentf-mode t) ;; Позволяет запоминать последние открытые файлы
 #+end_src
 
 Конфигурация для dashboard
@@ -721,9 +728,9 @@ Emacs Dashboard расширяемый начальный экран, отобр
     (setq dashboard-center-content nil) ;; set to 't' for centered content
     (setq dashboard-items '((recents . 10)
                             (agenda . 5 )
-                            (bookmarks . 3)
-                            (projects . 3)
-                            (registers . 3)))
+                            (bookmarks . 5)
+                            (projects . 5)
+                            (registers . 5)))
     :custom 
     (dashboard-modify-heading-icons '((recents . "file-text")
                                       (bookmarks . "book")))
@@ -762,13 +769,11 @@ Emacs Dashboard расширяемый начальный экран, отобр
   (add-to-list 'default-frame-alist '(font . "JetBrains Mono-11"))
 
   ;; Uncomment the following line if line spacing needs adjusting.
-  (setq-default line-spacing 2)
+;;  (setq-default line-spacing 2)
 #+end_src
 
 ** Установка темы
 #+begin_src emacs-lisp
-  ;; (use-package atom-one-dark-theme)
-  ;; (load-theme 'atom-one-dark t)
   (use-package solarized-theme)
   (load-theme 'solarized-dark t)
 #+end_src
@@ -792,6 +797,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
   (use-package all-the-icons-dired
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
+
 ** Rainbow-delimiters
 Добавляет окраску различным цветом скобок и кавычек
 
@@ -842,7 +848,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
 #+end_src
 
 * Reverse-im
-Ввод команд для Emacs на альтернативном языке. Должен располагаться после установки всех хоткеев.
+Ввод команд для Emacs происходит не зависимо от языка. Должен располагаться после установки всех хоткеев.
 #+begin_src emacs-lisp
   ;; Needed for `:after char-fold' to work
   (use-package char-fold
@@ -862,6 +868,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
     :config
     (reverse-im-mode t)) ; turn the mode on
 #+end_src
+
 * Установка значений переменных
 Настройка Emacs изменением стандартных переменных
 
@@ -891,3 +898,5 @@ Emacs Dashboard расширяемый начальный экран, отобр
 
   ;; (setq org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
 #+end_src
+
+#  LocalWords:  Плавная

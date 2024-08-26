@@ -2,7 +2,7 @@
 #+AUTHOR: Aleksey Malkov
 #+DESCRIPTION: AM's personal Emacs config.
 
-* MELPA
+* Melpa
 Дополнительный репозиторий пакетов для emacs.
 
 #+begin_src emacs-lisp
@@ -15,8 +15,8 @@
   (package-initialize)
 #+end_src
 
-* НАСТРОЙКИ USE-PACKAGE
-USE-PACKAGE включён в ядро, но в стандартной конфигурации он принимает только конфигурацию, не устанавливая пакет без ключа ~:ensure t~, что неудобно
+* Настройки use-package
+Use-package включён в ядро, но в стандартной конфигурации он принимает только конфигурацию, не устанавливая пакет без ключа ~:ensure t~, что неудобно
 #+begin_src emacs-lisp
   (use-package use-package
     :custom
@@ -25,7 +25,7 @@ USE-PACKAGE включён в ядро, но в стандартной конф�
     (warning-minimum-level :error))
 #+end_src
 
-* АВТОЗАВЕРШЕНИЕ
+* Автозавершение
 ** Vertico
 Vertico предоставляет производительный и минималистичный пользовательский интерфейс вертикального завершения, основанный на системе завершения по умолчанию
 #+begin_src emacs-lisp
@@ -310,7 +310,7 @@ Install =luacheck= from your Linux distro's repositories for flycheck to work co
     :init (global-flycheck-mode))
 #+end_src
 
-* НАСТРОЙКИ ДЛЯ ЯЗЫКОВ
+* Настройки для языков
 ** MARKDOWN MODE
 #+begin_src emacs-lisp
   (use-package markdown-mode
@@ -358,7 +358,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     ;; (org-modern-keyword nil)
     ;; (org-modern-checkbox nil)
     ;; (org-modern-table nil)
-    ;; (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно. Решил через установку отступа
+    (org-modern-star t) ;; Отключаю, так как уменьшается отступ слева у между заголовками разного уровня, для меня не удобно
     )
 #+end_src
 
@@ -422,7 +422,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
            "%?"
            :target
            (file+head "${slug}.org"
-                      "#+title: ${title}\n#+date: %u\n#+type: \n#+last_modified: %U\n\n")
+                      "#+title: ${title}\n#+date: %u\n#+last_modified: %U\ntype: \n\n")
            :immediate-finish t)
           ("b" "literature note" plain
            "%?"
@@ -537,6 +537,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
 ** Note Drawers for org
 Добавляет drawers (заметку) в заголовок текущего раздела. Drawers не выводятся при конвертации org файлов в другой формат
+
 #+begin_src emacs-lisp
   ;; Notes drawers
   (defun ews-org-insert-notes-drawer ()
@@ -556,7 +557,8 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
   (with-eval-after-load "org"
     (define-key org-mode-map (kbd "C-c C-x n") #'ews-org-insert-notes-drawer))
-#+end_src
+#+end_src 
+
 ** Проверка орфографии
 *** Flyspell
 Проверка орфографии с помощью утилиты hunspell
@@ -579,6 +581,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 
 *** Guess-language
 Определяет язык текста для работы Flyspell
+
 #+begin_src emacs-lisp
   (use-package guess-language         ; Automatically detect language for Flyspell
     :ensure t
@@ -590,6 +593,23 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
           guess-language-languages '(en ru)
           guess-language-min-paragraph-length 35)
     :diminish guess-language-mode)
+#+end_src
+
+*** Перебор языков при проверке
+Почему-то emacs крашится на коде ниже пока оставил вариант с guess-language
+
+#+begin_src emacs-lisp
+;;  (defvar mu-languages-ring nil "Languages ring for Ispell")
+;;
+;;  (let ((languages '("en_US" "ru_RU")))
+;;    (validate-setq mu-languages-ring (make-ring (length languages)))
+;;    (dolist (elem languages) (ring-insert mu-languages-ring elem)))
+;;
+;;  (defun mu-cycle-ispell-languages ()
+;;    (interactive)
+;;    (let ((language (ring-ref mu-languages-ring -1)))
+;;      (ring-insert mu-languages-ring language)
+;;      (ispell-change-dictionary language)))
 #+end_src
 ** Библиография
 *** Bibtex-mode
@@ -641,7 +661,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
   (use-package magit)
 #+end_src
 
-* PROJECTILE
+* Projectile
 [[https://github.com/bbatsov/projectile][Projectile]] is a project interaction library for Emacs.
 Для того, чтобы конкретная папка воспринималась как проект в ней или должна быть инициализирован git, либо в корне находится файл =.projectile=
 #+begin_src emacs-lisp
@@ -651,8 +671,8 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     (projectile-mode 1))
 #+end_src
 
-* УДОБСТВО
-** WHICH-KEY
+* Удобство
+** Which-key
 Отображает списки сочетаний клавиш, при вводе префиксов
 #+begin_src emacs-lisp
   (use-package which-key
@@ -675,14 +695,14 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
           which-key-separator " → " ))
 #+end_src
 
-** DIMINISH
+** Diminish
 This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
 
 #+begin_src emacs-lisp
   (use-package diminish)
 #+end_src
 
-** DASHBOARD
+** Dashboard
 Emacs Dashboard расширяемый начальный экран, отображающий последние файлы, закладки, задачи
 
 #+begin_src emacs-lisp
@@ -711,8 +731,8 @@ Emacs Dashboard расширяемый начальный экран, отобр
     (dashboard-setup-startup-hook))
 #+end_src
 
-* ОФОРМЛЕНИЕ
-** FONTS
+* Оформление
+** Шрифты
 Определение различных шрифтов, которые будет использовать Emacs.
 
 #+begin_src emacs-lisp
@@ -747,8 +767,10 @@ Emacs Dashboard расширяемый начальный экран, отобр
 
 ** Установка темы
 #+begin_src emacs-lisp
-  (use-package atom-one-dark-theme)
-  (load-theme 'atom-one-dark t)
+  ;; (use-package atom-one-dark-theme)
+  ;; (load-theme 'atom-one-dark t)
+  (use-package solarized-theme)
+  (load-theme 'solarized-dark t)
 #+end_src
 
 ** Плавная прокрутка
@@ -760,7 +782,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
         scroll-preserve-screen-position 1)
 #+end_src
 
-** ALL THE ICONS
+** All-the-icons
 Это набор значков, который можно использовать с dashboard, dired, ibuffer и другими программами Emacs
 
 #+begin_src emacs-lisp
@@ -770,7 +792,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
   (use-package all-the-icons-dired
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
-** RAINBOW DELIMITERS
+** Rainbow-delimiters
 Добавляет окраску различным цветом скобок и кавычек
 
 #+begin_src emacs-lisp
@@ -779,7 +801,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
            (clojure-mode . rainbow-delimiters-mode)))
 #+end_src
 
-** RAINBOW MODE
+** Rainbow-mode
 Отображать фактический цвет в качестве фона для любого шестнадцатеричного значения цвета (например, #ffffff). Приведенный ниже блок кода включает режим rainbow во всех режимах программирования (prog-mode), а также в org-mode, именно поэтому rainbow работает в этом документе.  
 
 #+begin_src emacs-lisp
@@ -811,7 +833,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
                       (mapconcat 'identity missing ", ")))))
 
   (ews-missing-executables
-   '("onlyoffice" "zip" "pdftotext" "ddjvu"
+   '("onlyoffice-desktopeditors" "zip" "pdftotext" "ddjvu"
      ("convert" "gm") "exiftool" "latex" "curl"
      "hunspell" ;; Spellcheck
      ("grep" "ripgrep") ;; Search files
@@ -819,7 +841,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
      ("mpg321" "ogg123" "mplayer" "mpv" "vlc"))) ;; Play music
 #+end_src
 
-* REVERSE-IM
+* Reverse-im
 Ввод команд для Emacs на альтернативном языке. Должен располагаться после установки всех хоткеев.
 #+begin_src emacs-lisp
   ;; Needed for `:after char-fold' to work
@@ -840,7 +862,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
     :config
     (reverse-im-mode t)) ; turn the mode on
 #+end_src
-* УСТАНОВКА ЗНАЧЕНИЙ ПЕРЕМЕННЫХ
+* Установка значений переменных
 Настройка Emacs изменением стандартных переменных
 
 #+begin_src emacs-lisp
@@ -867,5 +889,5 @@ Emacs Dashboard расширяемый начальный экран, отобр
   (put 'downcase-region 'disabled nil) ;; Включает команду преобразования в нижний регистр по C-x C-l
   (put 'narrow-to-region 'disabled nil) ;; Включает сужение, аналог zoom в logseq, выделенного региона по C-x n n
 
-  (setq org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
+  ;; (setq org-indent-indentation-per-level 4) ;; Отступ слева между уровнями заголовков
 #+end_src

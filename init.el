@@ -10,7 +10,8 @@
  ;; If there is more than one, they won't work right.
  '(company-show-quick-access t nil nil "Customized with use-package company")
  '(org-agenda-files
-   '("/home/aleksey/Documents/notes/daily/2023_08_24.org" "/home/aleksey/Documents/notes/daily/2023_10_01.org" "/home/aleksey/Documents/notes/daily/2023_10_03.org" "/home/aleksey/Documents/notes/daily/2023_10_16.org" "/home/aleksey/Documents/notes/daily/2023_10_18.org" "/home/aleksey/Documents/notes/daily/2024-03-19.org" "/home/aleksey/Documents/notes/daily/2024-04-14.org" "/home/aleksey/Documents/notes/dzheymichanPythonBystryyStart2021.org" "/home/aleksey/Documents/notes/финансы.org"))
+   '("/home/aleksey/Документы/notes/daily/2023_08_24.org" "/home/aleksey/Документы/notes/daily/2023_10_01.org" "/home/aleksey/Документы/notes/daily/2023_10_03.org" "/home/aleksey/Документы/notes/daily/2023_10_16.org" "/home/aleksey/Документы/notes/daily/2023_10_18.org" "/home/aleksey/Документы/notes/daily/2024-03-19.org" "/home/aleksey/Документы/notes/css.org" "/home/aleksey/Документы/notes/dzheymichanPythonBystryyStart2021.org" "/home/aleksey/Документы/notes/финансы.org"))
+ ;; '(org-roam-file-exclude-regexp '("data/" ".stversion/"))
  '(package-selected-packages
    '(solarized-theme which-key vertico toc-org reverse-im rainbow-mode rainbow-delimiters projectile org-modern org-fragtog org-appear org-agenda-files-track orderless olivetti markdown-mode marginalia magit lua-mode guess-language flyspell-correct flycheck embark-consult diminish dashboard company-posframe citar-org-roam citar-embark all-the-icons-dired)))
 (custom-set-faces

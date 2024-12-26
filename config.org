@@ -397,7 +397,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
 #+begin_src emacs-lisp
   (use-package org-roam
     :custom
-    (org-roam-directory (file-truename "~/Documents/notes")) ;; Задаёт путь к папке с org файлами
+    (org-roam-directory (file-truename "~/Документы/notes")) ;; Задаёт путь к папке с org файлами
     (org-roam-completion-everywhere t) ;; Позволяет выполнять completion-at-point набрав несколько символов в любом месте файла
     :bind (("C-c n l" . org-roam-buffer-toggle)
            ("C-c n f" . org-roam-node-find)
@@ -415,9 +415,14 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag))) ;; Настройка отображения заметок при вертикальном завершении
     (org-roam-db-autosync-mode) ;; Включает постоянное кеширование изменённых файлов
+   
     ;; If using org-roam-protocol
     ;; (require 'org-roam-protocol)
     )
+
+  (custom-set-variables
+   '(org-roam-file-exclude-regexp '("data/" ".stversion/")) ;; Игнорирует файлы и папки, соответствующие указанным регулярным выражениям
+  )
 #+end_src
 *** Шаблоны Org-roam для заметок
 #+begin_src emacs-lisp
@@ -502,7 +507,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     ;; (make-empty-file org-agenda-files 'force)g
     (org-store-new-agenda-file-list
      (directory-files-recursively
-      "~/Documents/notes" (rx ".org" eos) nil
+      "~/Документы/notes" (rx ".org" eos) nil
       ;; ignore hidden directories like .git and .attach
       (lambda (subdir)
         (not (eq ?. (string-to-char (file-name-nondirectory subdir)))))))
@@ -618,7 +623,7 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     :no-require
     :custom
     (org-cite-global-bibliography 
-     (directory-files "~/Documents/library/" t "^[A-Z|a-z|0-9].+.bib$"))
+     (directory-files "~/Документы/library/" t "^[A-Z|a-z|0-9].+.bib$"))
     (org-cite-insert-processor 'citar)
     (org-cite-follow-processor 'citar)
     (org-cite-activate-processor 'citar)

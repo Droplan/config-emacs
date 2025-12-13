@@ -415,14 +415,14 @@ Emacs has built-in programming language modes for Lisp, Scheme, DSSSL, Ada, ASM,
     ;; If you're using a vertical completion framework, you might want a more informative completion interface
     (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag))) ;; Настройка отображения заметок при вертикальном завершении
     (org-roam-db-autosync-mode) ;; Включает постоянное кеширование изменённых файлов
-   
+
     ;; If using org-roam-protocol
     ;; (require 'org-roam-protocol)
     )
 
   (custom-set-variables
    '(org-roam-file-exclude-regexp '("data/" ".stversion/")) ;; Игнорирует файлы и папки, соответствующие указанным регулярным выражениям
-  )
+   )
 #+end_src
 *** Шаблоны Org-roam для заметок
 #+begin_src emacs-lisp
@@ -818,7 +818,7 @@ Emacs Dashboard расширяемый начальный экран, отобр
                       (mapconcat 'identity missing ", ")))))
 
   (ews-missing-executables
-   '("onlyoffice-desktopeditors" "zip" "pdftotext" "ddjvu"
+   '("onlyoffice-desktopeditors" "gzip" "pdftotext" "ddjvu"
      ("convert" "gm") "exiftool" "latex" "curl"
      "hunspell" ;; Spellcheck
      ("grep" "ripgrep") ;; Search files
